@@ -22,7 +22,7 @@ export default function Login() {
       });
 
       if (!res.ok) throw new Error('Identifiants invalides');
-
+      console.log(res)
       const token: string = await res.json();
       localStorage.setItem('jwt', token);
       router.push('/profile');
