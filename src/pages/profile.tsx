@@ -4,7 +4,12 @@ import {
   graphqlRequest,
   USER_QUERY,
   CURSUS_QUERY,
-  PROJECT_QUERY_ALL,
+  PROJECT_QUERY,
+  CURSUS_INFO_QUERY,
+  AUDIT_QUERY,
+  XP_QUERY,
+  LEVEL_QUERY,
+  LAST_PROJECT_QUERY,
 } from '../services/apiService';
 
 // TYPES
@@ -25,25 +30,16 @@ interface Transaction {
   path: string;
 }
 
-interface Skill {
-  labelName: string;
-}
-
-const fakeSkills = [
-  { labelName: 'Front-End' },
-  { labelName: 'Back-End' },
-  { labelName: 'Algorithms' },
-  { labelName: 'Databases' },
-  { labelName: 'DevOps' },
-];
-
-// COMPONENT
 export default function Profile() {
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [cursus, setCursus] = useState<Cursus[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [cursusInfo, setCursusInfo] = useState<any>(null);
+  const [audits, setAudits] = useState<any[]>([]);
+  const [xpCursus, setXpCursus] = useState<number | null>(null);
+  const [level, setLevel] = useState<number | null>(null);
+  const [lastProject, setLastProject] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const [skills, setSkills] = useState<Skill[]>([]);
   const router = useRouter();
 
   useEffect(() => {
@@ -53,17 +49,14 @@ export default function Profile() {
       return;
     }
 
-    // 1️⃣ Récupérer les infos utilisateur
+    // Récupérer infos utilisateur
     graphqlRequest(USER_QUERY, token)
-    .then((data) => {
-      console.log('DATA USER:', data.user[0]); // 👈 regarde ça dans la console
-      setUserInfo(data.user[0]);
-      setSkills(data.user[0].labels);
-  })  
-  .catch(() => router.push('/login'));
+      .then((data) => {
+        setUserInfo(data.user[0]);
+      })
+      .catch(() => router.push('/login'));
 
-
-    // 2️⃣ Récupérer les cursus
+    // Récupérer cursus
     graphqlRequest(CURSUS_QUERY, token)
       .then((data) => {
         const events = data.user[0].events;
@@ -76,9 +69,9 @@ export default function Profile() {
       })
       .catch(() => console.log('Erreur chargement cursus'));
 
-      graphqlRequest(PROJECT_QUERY_ALL, token)
+    // Récupérer transactions projet
+    graphqlRequest(PROJECT_QUERY(1), token) // ici tu mets l'ID d'un cursus ou projet réel
       .then((data) => {
-        console.log('Transactions reçues :', data.transaction);
         const txList = data.transaction.map((tx: any) => ({
           amount: tx.amount,
           path: tx.object?.name ?? 'unknown',
@@ -86,8 +79,55 @@ export default function Profile() {
         setTransactions(txList);
         setLoading(false);
       })
-      .catch(() => console.log('Erreur chargement transactions'));    
+      .catch(() => console.log('Erreur chargement transactions'));
+
   }, [router]);
+
+  // Charger les autres queries quand cursus et userInfo sont prêts
+  useEffect(() => {
+    const token = localStorage.getItem('jwt');
+    if (!token || cursus.length === 0 || !userInfo) return;
+
+    const firstCursusId = cursus[0]?.id;
+
+    // CURSUS_INFO_QUERY
+    graphqlRequest(CURSUS_INFO_QUERY(firstCursusId), token)
+      .then((data) => {
+        setCursusInfo(data);
+      })
+      .catch(() => console.log('Erreur chargement info cursus'));
+
+    // AUDIT_QUERY
+    graphqlRequest(AUDIT_QUERY(userInfo.login), token)
+      .then((data) => {
+        setAudits(data.audit);
+      })
+      .catch(() => console.log('Erreur chargement audits'));
+
+    // XP_QUERY
+    graphqlRequest(XP_QUERY(firstCursusId), token)
+      .then((data) => {
+        const amount = data.transaction_aggregate.aggregate.sum.amount;
+        setXpCursus(amount);
+      })
+      .catch(() => console.log('Erreur chargement XP cursus'));
+
+    // LEVEL_QUERY
+    graphqlRequest(LEVEL_QUERY(userInfo.login, firstCursusId), token)
+      .then((data) => {
+        const levelData = data.event_user[0]?.level ?? null;
+        setLevel(levelData);
+      })
+      .catch(() => console.log('Erreur chargement niveau'));
+
+    // LAST_PROJECT_QUERY
+    graphqlRequest(LAST_PROJECT_QUERY, token)
+      .then((data) => {
+        setLastProject(data.progress[0]);
+      })
+      .catch(() => console.log('Erreur chargement dernier projet'));
+
+  }, [cursus, userInfo]);
 
   const handleLogout = () => {
     localStorage.removeItem('jwt');
@@ -97,7 +137,7 @@ export default function Profile() {
   if (loading) return <p className="text-center mt-20 text-xl">Chargement...</p>;
 
   return (
-    <div className="min-h-screen bg-gray-900 text-gray-200 p-4">
+    <div className="px-15 bg-gradient-to-r from-black to-blue-800 text-gray-200 p-4">
       {/* Header */}
       <header className="flex justify-between items-center mb-8">
         <h1 className="text-2xl font-bold">
@@ -112,12 +152,18 @@ export default function Profile() {
       </header>
 
       {/* Cartes Cursus Dynamiques */}
-      <section className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+      <section className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
         {cursus.length > 0 ? (
           cursus.map((c, idx) => (
-            <div key={idx} className="bg-purple-700 p-4 rounded shadow text-center">
-              <h2 className="font-semibold text-lg">{c.name}</h2>
-              <p>Type : {c.type}</p>
+            <div
+              key={idx}
+              className="relative group p-4 bg-black rounded-2xl shadow text-center overflow-hidden"
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-white-400 to-blue-500 opacity-0 group-hover:opacity-20 transition duration-500 rounded-2xl"></div>
+              <div className="relative z-10">
+                <h2 className="font-semibold text-lg">{c.name}</h2>
+                <p>Type : {c.type}</p>
+              </div>
             </div>
           ))
         ) : (
@@ -125,247 +171,70 @@ export default function Profile() {
         )}
       </section>
 
-      {/* Stats Section */}
-      <section className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-        <div className="bg-gray-800 p-4 rounded shadow text-center">
-          <h3 className="text-lg font-semibold mb-2">Mon XP Total</h3>
-          <p className="text-2xl font-bold">{userInfo?.totalUp} KB</p>
+      {/* Infos complémentaires */}
+      <section className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+        <div className="bg-gray-800 p-4 rounded shadow">
+          <h3 className="text-lg font-semibold mb-2">Infos Cursus</h3>
+          <pre>{JSON.stringify(cursusInfo, null, 2)}</pre>
         </div>
-        <div className="bg-gray-800 p-4 rounded shadow text-center">
+
+        <div className="bg-gray-800 p-4 rounded shadow overflow-auto">
           <h3 className="text-lg font-semibold mb-2">Audits</h3>
-          <p className="text-2xl font-bold">12 Passés</p>
-          <p className="text-green-500">👍 Aucun en attente</p>
-        </div>
-        <div className="bg-gray-800 p-4 rounded shadow text-center">
-          <h3 className="text-lg font-semibold mb-2">Ratio Audit</h3>
-          <p className="text-2xl font-bold">0.9</p>
-          <p className="text-yellow-400">⚠️ Attention à la moyenne</p>
-        </div>
-      </section>
-
-      {/* Graphique XP Distribution */}
-      <section className="bg-gray-800 p-4 rounded shadow mb-8">
-        <h3 className="text-lg font-semibold mb-4 text-center">
-          Distribution XP par Projet
-        </h3>
-        <svg width="100%" height="300" className="bg-gray-700 rounded">
-          {transactions.length > 0 ? (
-            transactions.slice(0, 5).map((tx, idx) => {
-              const barHeight = tx.amount / 10; // Ajuster si XP trop grand
-              const width = 60;
-              const gap = 20;
-              const x = idx * (width + gap) + gap;
-              return (
-                <g key={idx}>
-                  <rect
-                    x={x}
-                    y={300 - barHeight}
-                    width={width}
-                    height={barHeight}
-                    fill="teal"
-                  />
-                  <text
-                    x={x + width / 2}
-                    y={290}
-                    fontSize={10}
-                    textAnchor="middle"
-                    fill="white"
-                  >
-                    {tx.path}
-                  </text>
-                  <text
-                    x={x + width / 2}
-                    y={300 - barHeight - 5}
-                    fontSize={10}
-                    textAnchor="middle"
-                    fill="white"
-                  >
-                    {tx.amount}
-                  </text>
-                </g>
-              );
-            })
+          {audits.length > 0 ? (
+            <table className="w-full text-sm text-left text-gray-400">
+              <thead className="text-xs uppercase bg-gray-700 text-gray-400">
+                <tr>
+                  <th scope="col" className="px-4 py-2">Projet</th>
+                  <th scope="col" className="px-4 py-2">Capitaine</th>
+                  <th scope="col" className="px-4 py-2">Grade</th>
+                  <th scope="col" className="px-4 py-2">Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                {audits.map((audit, idx) => (
+                  <tr key={idx} className="border-b border-gray-700 hover:bg-gray-600">
+                    <td className="px-4 py-2">{audit.group.object.name}</td>
+                    <td className="px-4 py-2">{audit.group.captainLogin}</td>
+                    <td className="px-4 py-2">{audit.grade !== null ? audit.grade.toFixed(2) : 'En cours'}</td>
+                    <td className="px-4 py-2">{new Date(audit.group.createdAt).toLocaleDateString()}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           ) : (
-            <text x="50%" y="50%" fill="white" fontSize="16" textAnchor="middle">
-              Aucune donnée XP
-            </text>
+            <p>Aucun audit trouvé.</p>
           )}
-        </svg>
+        </div>
+
+        <div className="bg-gray-800 p-4 rounded shadow text-center">
+          <h3 className="text-lg font-semibold mb-2">XP Cursus</h3>
+          <p className="text-2xl font-bold text-purple-400">
+            {xpCursus !== null ? `${xpCursus.toLocaleString()} XP` : 'Chargement...'}
+          </p>
+        </div>
+
+        <div className="bg-gray-800 p-4 rounded shadow text-center">
+          <h3 className="text-lg font-semibold mb-2">Niveau</h3>
+          <p className="text-2xl font-bold text-green-400">
+            {level !== null ? `Niveau ${level}` : 'Chargement...'}
+          </p>
+        </div>
+
+        <div className="bg-gray-800 p-4 rounded shadow">
+          <h3 className="text-lg font-semibold mb-2">Dernier Projet</h3>
+          {lastProject ? (
+            <div>
+              <p><strong>Nom :</strong> {lastProject.object.name}</p>
+              <p><strong>Type :</strong> {lastProject.object.type}</p>
+              <p><strong>Date :</strong> {new Date(lastProject.createdAt).toLocaleDateString()}</p>
+              <p><strong>Terminé :</strong> {lastProject.isDone ? 'Oui' : 'Non'}</p>
+            </div>
+          ) : (
+            <p>Aucun projet trouvé.</p>
+          )}
+        </div>
+
       </section>
-
-      <section className="bg-gray-800 p-4 rounded shadow mb-8">
-  <h3 className="text-lg font-semibold mb-4 text-center">
-    Progression XP dans le temps
-  </h3>
-  <svg width="100%" height="300" className="bg-gray-700 rounded">
-    {transactions.length > 0 ? (() => {
-      const sorted = [...transactions]
-        .filter((tx) => tx.amount > 0)
-        .slice(0, 10)
-        .map((tx, idx) => ({
-          ...tx,
-          date: new Date().getTime() + idx * 86400000, // simulation car on n’a pas `createdAt`
-        }));
-
-      let cumulative = 0;
-      const points = sorted.map((tx, i) => {
-        cumulative += tx.amount;
-        const x = (i / (sorted.length - 1)) * 500;
-        const y = 300 - (cumulative / 10000); // Échelle à ajuster selon ton XP total
-        return { x, y, value: cumulative };
-      });
-
-      const pathData = points.map((p, i) =>
-        i === 0 ? `M${p.x},${p.y}` : `L${p.x},${p.y}`
-      ).join(' ');
-
-      return (
-        <>
-          <path d={pathData} stroke="cyan" strokeWidth="2" fill="none" />
-          {points.map((p, i) => (
-            <g key={i}>
-              <circle cx={p.x} cy={p.y} r="4" fill="cyan" />
-              <text x={p.x} y={p.y - 10} fontSize="10" fill="white" textAnchor="middle">
-                {Math.round(p.value)}
-              </text>
-            </g>
-          ))}
-        </>
-      );
-    })() : (
-      <text x="50%" y="50%" fill="white" fontSize="16" textAnchor="middle">
-        Aucune donnée
-      </text>
-    )}
-  </svg>
-</section>
-
-<section className="bg-gray-800 p-4 rounded shadow mb-8">
-  <h3 className="text-lg font-semibold mb-4 text-center">
-    Mes Compétences (Radar Chart)
-  </h3>
-  <svg viewBox="0 0 400 400" width="100%" height="400" className="bg-gray-700 rounded">
-    {fakeSkills.length > 0 ? (() => {
-      const centerX = 200;
-      const centerY = 200;
-      const radius = 100;
-      const total = skills.length;
-      const points = skills.map((skill, i) => {
-        const angle = (2 * Math.PI * i) / total - Math.PI / 2;
-        const x = centerX + radius * Math.cos(angle);
-        const y = centerY + radius * Math.sin(angle);
-        return { x, y, label: skill.labelName };
-      });
-
-      const polygonPoints = points.map((p) => `${p.x},${p.y}`).join(' ');
-
-      return (
-        <>
-          {/* Toile de fond (radar) */}
-          <polygon
-            points={polygonPoints}
-            stroke="cyan"
-            strokeWidth="2"
-            fill="rgba(0, 255, 255, 0.3)"
-          />
-          {points.map((p, i) => (
-            <g key={i}>
-              <circle cx={p.x} cy={p.y} r="4" fill="cyan" />
-              <text
-                x={p.x}
-                y={p.y}
-                fontSize="12"
-                fill="white"
-                textAnchor={p.x < centerX ? 'end' : 'start'}
-                alignmentBaseline="middle"
-              >
-                {p.label}
-              </text>
-              {/* Ligne depuis le centre */}
-              <line
-                x1={centerX}
-                y1={centerY}
-                x2={p.x}
-                y2={p.y}
-                stroke="gray"
-                strokeDasharray="2"
-              />
-            </g>
-          ))}
-        </>
-      );
-    })() : (
-      <text x="50%" y="50%" fill="white" fontSize="16" textAnchor="middle">
-        Aucune compétence trouvée
-      </text>
-    )}
-  </svg>
-</section>
-
-<section className="bg-gray-800 p-4 rounded shadow mb-8">
-  <h3 className="text-lg font-semibold mb-4 text-center">
-    Mes Compétences (Radar Chart)
-  </h3>
-  <svg viewBox="0 0 400 400" width="100%" height="400" className="bg-gray-700 rounded">
-    {(() => {
-      const combinedSkills = [
-        ...skills,
-        { labelName: 'Front-End' },
-        { labelName: 'Back-End' },
-        { labelName: 'Algorithms' },
-        { labelName: 'Databases' },
-        { labelName: 'DevOps' },
-      ];
-      const centerX = 200;
-      const centerY = 200;
-      const radius = 100;
-      const total = combinedSkills.length;
-      const points = combinedSkills.map((skill, i) => {
-        const angle = (2 * Math.PI * i) / total - Math.PI / 2;
-        const x = centerX + radius * Math.cos(angle);
-        const y = centerY + radius * Math.sin(angle);
-        return { x, y, label: skill.labelName };
-      });
-
-      const polygonPoints = points.map((p) => `${p.x},${p.y}`).join(' ');
-
-      return (
-        <>
-          <polygon
-            points={polygonPoints}
-            stroke="cyan"
-            strokeWidth="2"
-            fill="rgba(0, 255, 255, 0.3)"
-          />
-          {points.map((p, i) => (
-            <g key={i}>
-              <circle cx={p.x} cy={p.y} r="4" fill="cyan" />
-              <text
-                x={p.x}
-                y={p.y}
-                fontSize="12"
-                fill="white"
-                textAnchor={p.x < centerX ? 'end' : 'start'}
-                alignmentBaseline="middle"
-              >
-                {p.label}
-              </text>
-              <line
-                x1={centerX}
-                y1={centerY}
-                x2={p.x}
-                y2={p.y}
-                stroke="gray"
-                strokeDasharray="2"
-              />
-            </g>
-          ))}
-        </>
-      );
-    })()}
-  </svg>
-</section>
-
     </div>
   );
 }
