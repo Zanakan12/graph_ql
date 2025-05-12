@@ -12,6 +12,7 @@ import {
   LAST_PROJECT_QUERY,
 } from '../services/apiService';
 
+import UserSettingsCard from '../components/UserSettingsCard';
 import { XpOverTimeChart, XpBarChart } from '../components/XpCharts';
 import ProfileHeader from '../components/ProfileHeader';
 import CursusCards from '../components/CursusCards';
@@ -84,7 +85,7 @@ export default function Profile() {
         setLevel(data.event_user[0]?.level ?? null)
       ),
       graphqlRequest(LAST_PROJECT_QUERY, token).then((data) => {
-        console.log(data)
+        console.log("data of last project",data)
         const project = data.progress && data.progress.length > 0 ? data.progress[0] : null;
         setLastProject(project);
       }),
@@ -106,9 +107,15 @@ export default function Profile() {
   return (
     <div className="px-15 bg-gradient-to-r from-black to-blue-800 text-gray-200 p-4">
       <ProfileHeader userInfo={userInfo} />
-      <div className="flex flex-wrap h-fit items-center">
-        <LevelCircle level={level} />
-        <XpCursusCard xpCursus={xpCursus} />
+      
+      <div className="w-fit items-center mb-10">
+        <div className="ml-6">
+          <LevelCircle level={level} />
+        </div>
+        <div className="m-2">
+          <XpCursusCard xpCursus={xpCursus} />
+        </div>
+        
       </div>
 
       <CursusCards
@@ -129,9 +136,11 @@ export default function Profile() {
         <RecentAuditsList audits={audits} />
         <BestSkillsRadar />
       </section>
-
-      <XpBarChart transactions={transactions} />
-      <XpOverTimeChart transactions={transactions} />
+      
+      <section className=" grid grid-cols-1 md:grid-cols-2 gap-1 mb-8">
+        <XpBarChart transactions={transactions} />
+        <XpOverTimeChart transactions={transactions} />
+      </section>
     </div>
   );
 }

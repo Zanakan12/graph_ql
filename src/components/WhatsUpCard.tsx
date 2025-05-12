@@ -1,7 +1,7 @@
 export default function WhatsUpCard({ lastProject }) {
   if (!lastProject) {
     return (
-      <div className="bg-gray-800 p-4 rounded shadow mb-4 w-full">
+      <div className="bg-black p-4 rounded shadow mb-4 w-full border">
         <h3 className="text-lg font-semibold mb-2">What's up</h3>
         <p className="text-gray-400">Aucun projet en cours trouvé.</p>
       </div>
@@ -9,7 +9,7 @@ export default function WhatsUpCard({ lastProject }) {
   }
 
   return (
-    <div className="bg-gray-800 p-4 rounded shadow mb-4 w-full">
+    <div className="bg-black p-4 rounded shadow mb-4 w-full">
       <h3 className="text-lg font-semibold mb-2">What's up</h3>
       <p className="text-purple-400 font-bold text-xl mb-2">{lastProject.object.name}</p>
       <p className="text-sm text-gray-400">

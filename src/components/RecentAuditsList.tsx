@@ -1,13 +1,13 @@
 export default function RecentAuditsList({ audits }) {
     return (
-      <div className="bg-gray-800 p-4 rounded shadow mb-8">
+      <div className="bg-black p-4 rounded shadow mb-8 border">
         <h3 className="text-lg font-semibold mb-4">Les derniers élèves auditionnés</h3>
         {audits.length > 0 ? (
           <div className="space-y-4">
             {audits.slice(0, 3).map((audit, idx) => (
               <div
                 key={idx}
-                className="p-3 bg-gray-700 rounded-lg hover:bg-gray-600 transition"
+                className="p-3 bg-black rounded-lg hover:bg-blue-600 transition border"
               >
                 <div className="flex justify-between items-center">
                   <p className="font-semibold text-white">{audit.group.captainLogin}</p>

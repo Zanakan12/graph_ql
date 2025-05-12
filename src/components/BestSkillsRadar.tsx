@@ -36,9 +36,9 @@ export default function BestSkillsRadar() {
   const innerPolygon = innerPoints.map((p) => `${p.x},${p.y}`).join(' ');
 
   return (
-    <div className="bg-gray-800 p-4 rounded shadow mb-8">
+    <div className="bg-black-4 rounded shadow mb-8">
       <h3 className="text-lg font-semibold mb-4 text-center">Best Skills</h3>
-      <svg viewBox="0 0 400 400" width="100%" height="400" className="bg-gray-700 rounded">
+      <svg viewBox="0 0 400 400" width="100%" height="400" className="bg-black rounded border-1">
         {outerPoints.map((p, i) => (
           <line
             key={i}

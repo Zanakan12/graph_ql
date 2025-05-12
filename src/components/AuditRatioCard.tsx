@@ -13,15 +13,15 @@ export default function AuditRatioCard({ userInfo }) {
       : 'bg-gray-500';
   
     return (
-      <div className="bg-gray-800 p-4 rounded shadow mb-8 w-full">
+      <div className="bg-black p-4 rounded shadow mb-8 w-full border">
         <h3 className="text-lg font-semibold mb-4">Audit Ratio</h3>
         {userInfo ? (
           <div>
             <div className="flex justify-between items-center mb-2">
-              <span className="text-sm text-gray-400">Ratio global</span>
+              <span className="text-sm bg-black">Ratio global</span>
               <span className="text-xl font-bold text-white">{ratio}</span>
             </div>
-            <div className="w-60 bg-gray-700 h-4 rounded-full overflow-hidden">
+            <div className="w-60 bg-white h-4 rounded-full overflow-hidden">
               <div
                 className={`h-4 rounded-full ${barColor}`}
                 style={{ width: `${progressWidth}%` }}
