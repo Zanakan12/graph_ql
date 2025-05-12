@@ -28,16 +28,6 @@ export async function graphqlRequest(query: string, token: string, variables?: a
   return result.data;
 }
 
-export async function updateUserProfile(token: string, id: number, email: string, attrs: any) {
-    return graphqlRequest(
-      {
-        query: UPDATE_USER_MUTATION,
-        variables: { id, email, attrs },
-      },
-      token
-    );
-  }
-  
 
 /* -------------------------------------------
    1️⃣ Query pour récupérer les données utilisateur

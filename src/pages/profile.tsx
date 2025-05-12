@@ -12,7 +12,7 @@ import {
   LAST_PROJECT_QUERY,
 } from '../services/apiService';
 
-import UserSettingsCard from '../components/UserSettingsCard';
+//import UserSettingsCard from '../components/UserSettingsCard';
 import { XpOverTimeChart, XpBarChart } from '../components/XpCharts';
 import ProfileHeader from '../components/ProfileHeader';
 import CursusCards from '../components/CursusCards';
