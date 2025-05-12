@@ -1,4 +1,20 @@
-export default function RecentAuditsList({ audits }) {
+interface Audit {
+  grade: number | null;
+  resultId: number | null;
+  private: {
+    code: string | null;
+  };
+  group: {
+    captainLogin: string;
+    createdAt: string;
+    object: {
+      name: string;
+      type: string;
+    };
+  };
+}
+
+export default function RecentAuditsList({ audits }: { audits: Audit[] }) {
     return (
       <div className="bg-black p-4 rounded shadow mb-8 border">
         <h3 className="text-lg font-semibold mb-4">Les derniers élèves auditionnés</h3>

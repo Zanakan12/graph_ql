@@ -7,7 +7,12 @@ const API_URL = 'https://zone01normandie.org/api/graphql-engine/v1/graphql';
  * @param query - La requête GraphQL
  * @param variables - Les variables (optionnelles)
  */
-export async function graphqlRequest(query: string, token: string, variables?: any) {
+
+export async function graphqlRequest(
+    query: string,
+    token: string,
+    variables?: Record<string, unknown>
+  ) {
   const response = await fetch(API_URL, {
     method: 'POST',
     headers: {

@@ -12,6 +12,7 @@ import {
   LAST_PROJECT_QUERY,
 } from '../services/apiService';
 
+
 //import UserSettingsCard from '../components/UserSettingsCard';
 import { XpOverTimeChart, XpBarChart } from '../components/XpCharts';
 import ProfileHeader from '../components/ProfileHeader';
@@ -25,17 +26,47 @@ import RecentAuditsList from '../components/RecentAuditsList';
 import BestSkillsRadar from '../components/BestSkillsRadar';
 
 
+interface CursusEvent {
+  event: {
+    id: number;
+    object: {
+      name: string;
+      type: string;
+    };
+  };
+}
+
+interface Cursus {
+  id: number;
+  name: string;
+  type: string;
+}
+
+interface UserInfo {
+  login: string;
+  totalUp: number;
+  totalDown: number;
+}
+
+interface Transaction {
+  amount: number;
+  createdAt: string;
+  object?: {
+    name?: string;
+  };
+}
+
+
 export default function Profile() {
-  const [userInfo, setUserInfo] = useState(null);
-  const [cursus, setCursus] = useState([]);
+  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [selectedCursusId, setSelectedCursusId] = useState<number | null>(null);
   const [transactions, setTransactions] = useState([]);
   const [cursusInfo, setCursusInfo] = useState(null);
+  const [cursus, setCursus] = useState<Cursus[]>([]);
   const [audits, setAudits] = useState([]);
   const [xpCursus, setXpCursus] = useState(null);
   const [level, setLevel] = useState(null);
   const [lastProject, setLastProject] = useState(null);
-  const [loading, setLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
@@ -52,11 +83,11 @@ export default function Profile() {
     graphqlRequest(CURSUS_QUERY, token)
       .then((data) => {
         const events = data.user[0].events;
-        const cursusList = events.map((e) => ({
+        const cursusList = events.map((e: CursusEvent) => ({
           id: e.event.id,
           name: e.event.object.name,
           type: e.event.object.type,
-        }));
+        }));        
         setCursus(cursusList);
       })
       .catch(() => console.log('Erreur chargement cursus'));
@@ -73,7 +104,6 @@ export default function Profile() {
     const token = localStorage.getItem('jwt');
     if (!token || !selectedCursusId || !userInfo) return;
 
-    setLoading(true);
 
     Promise.all([
       graphqlRequest(CURSUS_INFO_QUERY(selectedCursusId), token).then(setCursusInfo),
@@ -90,16 +120,15 @@ export default function Profile() {
         setLastProject(project);
       }),
       graphqlRequest(PROJECT_QUERY(selectedCursusId), token).then((data) => {
-        const txList = data.transaction.map((tx) => ({
+        const txList = data.transaction.map((tx: Transaction) => ({
           amount: tx.amount,
           path: tx.object?.name ?? 'unknown',
           createdAt: tx.createdAt,
-        }));
+        }));        
         setTransactions(txList);        
       }),
     ])
       .catch((error) => console.log('Erreur chargement des données :', error))
-      .finally(() => setLoading(false));
   }, [selectedCursusId, userInfo]);
 
   //if (loading) return <p className="text-center mt-20 text-xl">Chargement...</p>;
@@ -130,7 +159,7 @@ export default function Profile() {
 
       <section className="grid grid-cols-1 md:grid-cols-3 gap-1 mb-8">
         <div className="flex flex-wrap h-fit items-center">
-          <AuditRatioCard userInfo={userInfo} />
+        {userInfo && <AuditRatioCard userInfo={userInfo} />}
           <div className='mt-22 w-full'>
             <WhatsUpCard lastProject={lastProject} />
           </div>

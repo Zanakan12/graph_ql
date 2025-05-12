@@ -1,9 +1,17 @@
 // ProfileHeader.tsx
 import { useRouter } from 'next/router';
 
-export default function ProfileHeader({ userInfo }) {
-  const router = useRouter();
+interface UserInfo {
+  login: string;
+  totalUp: number;
+  totalDown: number;
+}
 
+export default function ProfileHeader({ userInfo }: { userInfo: UserInfo | null }) {
+
+  const router = useRouter();
+  if (!userInfo) return null;
+  
   const handleLogout = () => {
     localStorage.removeItem('jwt');
     router.push('/login');

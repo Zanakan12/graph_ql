@@ -1,4 +1,13 @@
-export default function WhatsUpCard({ lastProject }) {
+interface Project {
+  createdAt: string;
+  isDone: boolean;
+  object: {
+    name: string;
+    type: string;
+  };
+}
+
+export default function WhatsUpCard({ lastProject }: { lastProject: Project | null }) {
   if (!lastProject) {
     return (
       <div className="bg-black p-4 rounded shadow mb-4 w-full border">

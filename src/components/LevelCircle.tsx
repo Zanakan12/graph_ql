@@ -1,5 +1,9 @@
  // LevelCircle.tsx
-  export default function LevelCircle({ level }) {
+ interface Props {
+  level: number | null;
+}
+
+export default function LevelCircle({ level }: Props) {
     return (
       <div className="bg-gray-800 p-4 shadow text-center rounded-full w-20 h-20">
         <h3 className="font-semibold">Niveau</h3>
