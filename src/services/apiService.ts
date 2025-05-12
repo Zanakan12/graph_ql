@@ -194,3 +194,22 @@ mutation UpdateUser($id: Int!, $email: String!, $attrs: jsonb!) {
   }
 }
 `;
+
+export const LAST_PROJECT_QUERY = `
+query {
+    progress(
+        where: {
+            object: { type: { _eq: "project" } },
+            isDone: { _eq: false }
+        }
+        order_by: { createdAt: desc }
+        limit: 1
+    ) {
+        createdAt
+        object {
+            name
+            type
+        }
+        isDone
+    }
+}`;

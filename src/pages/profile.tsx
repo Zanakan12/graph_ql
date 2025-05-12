@@ -93,7 +93,7 @@ export default function Profile() {
         const txList = data.transaction.map((tx) => ({
           amount: tx.amount,
           path: tx.object?.name ?? 'unknown',
-          createdAt: tx.createdAt, // 👈 INDISPENSABLE POUR LE GRAPHE
+          createdAt: tx.createdAt,
         }));
         setTransactions(txList);        
       }),
