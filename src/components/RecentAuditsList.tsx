@@ -1,6 +1,6 @@
 export default function RecentAuditsList({ audits }) {
     return (
-      <div className="bg-gray-800 p-4 rounded shadow mb-8 ">
+      <div className="bg-gray-800 p-4 rounded shadow mb-8">
         <h3 className="text-lg font-semibold mb-4">Les derniers élèves auditionnés</h3>
         {audits.length > 0 ? (
           <div className="space-y-4">

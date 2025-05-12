@@ -1,23 +1,23 @@
 export default function WhatsUpCard({ lastProject }) {
+  if (!lastProject) {
     return (
-      <div className="bg-gray-800 p-4 rounded shadow mb-8 text-center w-full">
-        <h3 className="text-lg font-semibold mb-4">What's up</h3>
-        {lastProject ? (
-          <div>
-            <p className="text-xl font-bold text-purple-400 mb-4">
-              {lastProject.object.name}
-            </p>
-            <p className="text-sm text-gray-500">
-              Date de démarrage : {new Date(lastProject.createdAt).toLocaleDateString()}
-            </p>
-            <p className="mt-2 text-orange-300 font-semibold">
-              {lastProject.isDone ? 'Terminé ✔️' : 'Encore en cours'}
-            </p>
-          </div>
-        ) : (
-          <p className="text-gray-400">Aucun projet en cours trouvé.</p>
-        )}
+      <div className="bg-gray-800 p-4 rounded shadow mb-4 w-full">
+        <h3 className="text-lg font-semibold mb-2">What's up</h3>
+        <p className="text-gray-400">Aucun projet en cours trouvé.</p>
       </div>
     );
   }
-  
+
+  return (
+    <div className="bg-gray-800 p-4 rounded shadow mb-4 w-full">
+      <h3 className="text-lg font-semibold mb-2">What's up</h3>
+      <p className="text-purple-400 font-bold text-xl mb-2">{lastProject.object.name}</p>
+      <p className="text-sm text-gray-400">
+        Commencé le {new Date(lastProject.createdAt).toLocaleDateString()}
+      </p>
+      <p className="text-green-400 font-medium mt-2">
+        {lastProject.isDone ? 'Projet terminé ✔️' : 'Encore en cours 🚀'}
+      </p>
+    </div>
+  );
+}
