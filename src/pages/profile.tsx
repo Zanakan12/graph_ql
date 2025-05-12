@@ -102,7 +102,7 @@ export default function Profile() {
       .finally(() => setLoading(false));
   }, [selectedCursusId, userInfo]);
 
-  if (loading) return <p className="text-center mt-20 text-xl">Chargement...</p>;
+  //if (loading) return <p className="text-center mt-20 text-xl">Chargement...</p>;
 
   return (
     <div className="px-15 bg-gradient-to-r from-black to-blue-800 text-gray-200 p-4">

@@ -115,7 +115,7 @@ export default function RanksPage() {
       {/* Message to next rank */}
       {nextRank && (
         <p className="text-center text-gray-400 text-sm">
-          You're{' '}
+          You&apos;re{' '}
           <span className="text-purple-400 font-bold">{levelToNext} level{levelToNext > 1 ? 's' : ''}</span>{' '}
           away from being <span className="text-white font-medium">{nextRank.title}</span>!
         </p>
