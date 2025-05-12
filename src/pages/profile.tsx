@@ -131,7 +131,9 @@ export default function Profile() {
       <section className="grid grid-cols-1 md:grid-cols-3 gap-1 mb-8">
         <div className="flex flex-wrap h-fit items-center">
           <AuditRatioCard userInfo={userInfo} />
-          <WhatsUpCard lastProject={lastProject} />
+          <div className='mt-22 w-full'>
+            <WhatsUpCard lastProject={lastProject} />
+          </div>
         </div>
         <RecentAuditsList audits={audits} />
         <BestSkillsRadar />

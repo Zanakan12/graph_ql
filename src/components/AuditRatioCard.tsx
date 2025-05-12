@@ -1,5 +1,11 @@
 // AuditRatioCard.tsx
-export default function AuditRatioCard({ userInfo }) {
+interface UserInfo {
+  totalUp: number;
+  totalDown: number;
+}
+
+export default function AuditRatioCard({ userInfo }: { userInfo: UserInfo }) {
+
     const ratio = userInfo ? (userInfo.totalUp / userInfo.totalDown).toFixed(2) : null;
     const progressWidth = userInfo
       ? Math.min((userInfo.totalUp / userInfo.totalDown) * 100, 100)
@@ -29,8 +35,8 @@ export default function AuditRatioCard({ userInfo }) {
             </div>
             <div className="mt-4 text-sm text-gray-400">
               <p>
-                <strong>{userInfo.totalUp.toLocaleString()} audits passé</strong> /{' '}
-                <strong>{userInfo.totalDown.toLocaleString()} audits reçus</strong>
+                <strong>{userInfo.totalUp.toLocaleString()} xp d&apos;audits passés</strong> /{' '}
+                <strong>{userInfo.totalDown.toLocaleString()} xp d&apos;audits reçus</strong>
               </p>
             </div>
           </div>
