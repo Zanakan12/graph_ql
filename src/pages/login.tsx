@@ -28,7 +28,7 @@ export default function Login() {
       console.log(res)
       const token: string = await res.json();
       localStorage.setItem('jwt', token);
-      router.push('/profile');
+      router.push('/index');
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message);
