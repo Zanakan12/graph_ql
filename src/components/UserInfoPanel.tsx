@@ -78,7 +78,7 @@ export default function UserInfoPanel({ user }: UserInfoPanelProps) {
   ];
 
   return (
-    <div className="bg-black text-white p-6 max-w-xl mx-auto rounded-lg shadow-lg">
+    <div className="absolute left-15 top-14.5 bg-black text-white p-6 max-w-xl mx-auto rounded-lg shadow-lg bg-opacity-50 z-11 border ">
       <div className="mb-6">
         <h2 className="text-2xl font-bold uppercase">
           {attrs.firstName} {attrs.lastName}
