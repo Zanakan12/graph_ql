@@ -28,7 +28,7 @@ export default function Login() {
       console.log(res)
       const token: string = await res.json();
       localStorage.setItem('jwt', token);
-      router.push('/index');
+      router.push('/');
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message);
@@ -40,30 +40,32 @@ export default function Login() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen">
-      <h2 className="text-2xl font-bold mb-4">Connexion</h2>
-      <form onSubmit={handleSubmit} className="flex flex-col w-64">
-        <input
-          type="text"
-          placeholder="Nom d'utilisateur ou Email"
-          value={login}
-          onChange={(e) => setLogin(e.target.value)}
-          required
-          className="mb-2 p-2 border rounded"
-        />
-        <input
-          type="password"
-          placeholder="Mot de passe"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          className="mb-2 p-2 border rounded"
-        />
-        <button type="submit" className="bg-blue-500 text-white py-2 rounded">
-          Se connecter
-        </button>
-      </form>
-      {error && <p className="text-red-500 mt-2">{error}</p>}
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-black to-blue-800">
+      <div className='p-10 border rounded'>
+        <h2 className="text-2xl font-bold mb-4">Connexion</h2>
+        <form onSubmit={handleSubmit} className="flex flex-col w-64">
+          <input
+            type="text"
+            placeholder="Nom d'utilisateur ou Email"
+            value={login}
+            onChange={(e) => setLogin(e.target.value)}
+            required
+            className="mb-2 p-2 border rounded"
+          />
+          <input
+            type="password"
+            placeholder="Mot de passe"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            className="mb-2 p-2 border rounded"
+          />
+          <button type="submit" className="bg-blue-500 text-white py-2 rounded">
+            Se connecter
+          </button>
+        </form>
+        {error && <p className="text-red-500 mt-2">{error}</p>}
+      </div>
     </div>
   );
 }

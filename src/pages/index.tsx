@@ -13,7 +13,7 @@ import {
 } from '../services/apiService';
 
 
-//import UserSettingsCard from '../components/UserSettingsCard';
+import { UserInfo } from '../types/UserInfo';
 import { XpOverTimeChart, XpBarChart } from '../components/XpCharts';
 import ProfileHeader from '../components/ProfileHeader';
 import CursusCards from '../components/CursusCards';
@@ -40,12 +40,6 @@ interface Cursus {
   id: number;
   name: string;
   type: string;
-}
-
-interface UserInfo {
-  login: string;
-  totalUp: number;
-  totalDown: number;
 }
 
 interface Transaction {
@@ -77,8 +71,11 @@ export default function Profile() {
     }
 
     graphqlRequest(USER_QUERY, token)
-      .then((data) => setUserInfo(data.user[0]))
+      .then((data) => {
+        setUserInfo(data.user[0]);
+      })
       .catch(() => router.push('/login'));
+
 
     graphqlRequest(CURSUS_QUERY, token)
       .then((data) => {
@@ -115,10 +112,11 @@ export default function Profile() {
         setLevel(data.event_user[0]?.level ?? null)
       ),
       graphqlRequest(LAST_PROJECT_QUERY, token).then((data) => {
-        console.log("data of last project",data)
+        console.log("data of last project",userInfo)
         const project = data.progress && data.progress.length > 0 ? data.progress[0] : null;
         setLastProject(project);
       }),
+
       graphqlRequest(PROJECT_QUERY(selectedCursusId), token).then((data) => {
         const txList = data.transaction.map((tx: Transaction) => ({
           amount: tx.amount,
@@ -136,7 +134,6 @@ export default function Profile() {
   return (
     <div className="px-15 bg-gradient-to-r from-black to-blue-800 text-gray-200 p-4">
       <ProfileHeader userInfo={userInfo} />
-      
       <div className="w-fit items-center mb-10">
         <div className="ml-6">
           <LevelCircle level={level} />

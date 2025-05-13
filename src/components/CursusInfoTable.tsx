@@ -21,7 +21,6 @@ interface Props {
 }
 
 export default function CursusInfoTable({ cursusInfo }: Props) {
-
     return (
       <div className="bg-black p-4 rounded shadow h-fit ">
         <h3 className="text-lg font-semibold mb-2">Infos Cursus</h3>
