@@ -6,7 +6,6 @@ interface UserInfoPanelProps {
   user: UserInfo;
 }
 
-
 export default function UserInfoPanel({ user }: UserInfoPanelProps) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const { attrs } = user;
