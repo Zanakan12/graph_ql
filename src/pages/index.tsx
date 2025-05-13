@@ -13,7 +13,6 @@ import {
 } from '../services/apiService';
 
 
-import { UserInfo } from '../types/UserInfo';
 import { XpOverTimeChart, XpBarChart } from '../components/XpCharts';
 import ProfileHeader from '../components/ProfileHeader';
 import CursusCards from '../components/CursusCards';
@@ -24,6 +23,32 @@ import AuditRatioCard from '../components/AuditRatioCard';
 import WhatsUpCard from '../components/WhatsUpCard';
 import RecentAuditsList from '../components/RecentAuditsList';
 import BestSkillsRadar from '../components/BestSkillsRadar';
+
+interface UserAttrs {
+  firstName: string;
+  lastName: string;
+  gender: string;
+  dateOfBirth: string;
+  placeOfBirth: string;
+  country: string;
+  addressStreet: string;
+  addressComplementStreet: string;
+  addressPostalCode: string;
+  addressCity: string;
+  addressCountry: string;
+  email: string;
+  Phone: string;
+  emergencyFirstName: string;
+  emergencyLastName: string;
+  emergencyAffiliation: string;
+  emergencyTel: string;
+}
+interface UserInfo {
+  login: string;
+  totalUp: number;
+  totalDown: number;
+  attrs: UserAttrs;
+}
 
 
 interface CursusEvent {
