@@ -19,7 +19,6 @@ export interface UserAttrs {
     emergencyAffiliation: string;
     emergencyTel: string;
   }
-  
   export interface UserInfo {
     login: string;
     totalUp: number;
