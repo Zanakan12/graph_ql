@@ -159,27 +159,29 @@ export default function Profile() {
         }));        
         setTransactions(txList);        
       }),
-   graphqlRequest(SkillsAmounts, token)
-    .then((data) => {
+      graphqlRequest(SkillsAmounts, token).then((data) => {
       const transactions = data.user[0].transactions;
 
-      // Agrégation par type
       const totals: Record<string, number> = {};
+
       for (let tx of transactions) {
-        console.log(typeof(tx.amount))
-        if (tx.amount >= 10){
-          console.log(tx.amount)
+        const amount = Number(tx.amount);
+        if (!isNaN(amount) && amount >= 10) {
           if (!totals[tx.type]) totals[tx.type] = 0;
-          totals[tx.type] += tx.amount;
-        } 
+          totals[tx.type] += amount;
+        }
       }
-      console.log("🧠 Totaux filtrés :", totals);
 
       const max = Math.max(...Object.values(totals));
-      const normalized = Object.entries(totals).map(([type, total]) => ({
-        name: type.slice(6).toLocaleUpperCase(),
-        value: Math.round((total / max) * 100),
-      }));
+
+      const normalized = Object.entries(totals)
+        .map(([type, total]) => ({
+          name: type.slice(6).toLocaleUpperCase(), // "skill_go" -> "GO"
+          value: Math.round((total / max) * 100),
+        }))
+        .sort((a, b) => b.value - a.value) // du plus haut au plus bas
+        .slice(0, 5); // top 5
+
       setSkills(normalized);
     }),
     ])
