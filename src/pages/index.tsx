@@ -75,14 +75,7 @@ interface Transaction {
     name?: string;
   };
 }
-interface Skill {
-  name: string;
-  value: number;
-}
 
-interface BestSkillsRadarProps {
-  skills: Skill[];
-}
 
 
 export default function Profile() {
@@ -164,7 +157,7 @@ export default function Profile() {
 
       const totals: Record<string, number> = {};
 
-      for (let tx of transactions) {
+      for (const tx of transactions) {
         const amount = Number(tx.amount);
         if (!isNaN(amount) && amount >= 10) {
           if (!totals[tx.type]) totals[tx.type] = 0;
