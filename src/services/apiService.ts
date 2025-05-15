@@ -208,3 +208,25 @@ query {
         isDone
     }
 }`;
+
+// Amount of every skills
+export const SkillsAmounts =`
+    query GetSkills {
+        user {
+            transactions(
+            where: {
+                _and: [
+                { type: { _neq: "xp" } },
+                { type: { _neq: "level" } }
+                { type: { _neq: "up" } }
+                { type: { _neq: "down" } }
+                ]
+            }
+            order_by: { createdAt: asc }
+            ) {
+                type
+                amount
+            }
+        }
+    }
+`

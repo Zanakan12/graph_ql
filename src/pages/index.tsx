@@ -10,6 +10,7 @@ import {
   XP_QUERY,
   LEVEL_QUERY,
   LAST_PROJECT_QUERY,
+  SkillsAmounts
 } from '../services/apiService';
 
 
@@ -74,9 +75,18 @@ interface Transaction {
     name?: string;
   };
 }
+interface Skill {
+  name: string;
+  value: number;
+}
+
+interface BestSkillsRadarProps {
+  skills: Skill[];
+}
 
 
 export default function Profile() {
+  const [skills, setSkills] = useState<{ name: string; value: number }[]>([]);
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [selectedCursusId, setSelectedCursusId] = useState<number | null>(null);
   const [transactions, setTransactions] = useState([]);
@@ -137,7 +147,6 @@ export default function Profile() {
         setLevel(data.event_user[0]?.level ?? null)
       ),
       graphqlRequest(LAST_PROJECT_QUERY, token).then((data) => {
-        console.log("data of last project",userInfo)
         const project = data.progress && data.progress.length > 0 ? data.progress[0] : null;
         setLastProject(project);
       }),
@@ -150,6 +159,29 @@ export default function Profile() {
         }));        
         setTransactions(txList);        
       }),
+   graphqlRequest(SkillsAmounts, token)
+    .then((data) => {
+      const transactions = data.user[0].transactions;
+
+      // Agrégation par type
+      const totals: Record<string, number> = {};
+      for (let tx of transactions) {
+        console.log(typeof(tx.amount))
+        if (tx.amount >= 10){
+          console.log(tx.amount)
+          if (!totals[tx.type]) totals[tx.type] = 0;
+          totals[tx.type] += tx.amount;
+        } 
+      }
+      console.log("🧠 Totaux filtrés :", totals);
+
+      const max = Math.max(...Object.values(totals));
+      const normalized = Object.entries(totals).map(([type, total]) => ({
+        name: type.slice(6).toLocaleUpperCase(),
+        value: Math.round((total / max) * 100),
+      }));
+      setSkills(normalized);
+    }),
     ])
       .catch((error) => console.log('Erreur chargement des données :', error))
   }, [selectedCursusId, userInfo]);
@@ -187,7 +219,8 @@ export default function Profile() {
           </div>
         </div>
         <RecentAuditsList audits={audits} />
-        <BestSkillsRadar />
+        {skills.length > 0 && <BestSkillsRadar skills={skills} />}
+
       </section>
       
       <section className=" grid grid-cols-1 md:grid-cols-2 gap-1 mb-8">

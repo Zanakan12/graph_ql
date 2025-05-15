@@ -1,22 +1,22 @@
-// BestSkillsRadar.tsx
-import { motion } from 'framer-motion';
+import { motion } from "framer-motion";
 
-const skillsMock = [
-  { name: 'Front-End', value: 80 },
-  { name: 'Back-End', value: 70 },
-  { name: 'Algorithms', value: 65 },
-  { name: 'Databases', value: 75 },
-  { name: 'DevOps', value: 50 },
-];
+export interface Skill {
+  name: string;
+  value: number;
+}
 
-export default function BestSkillsRadar() {
+interface BestSkillsRadarProps {
+  skills: Skill[];
+}
+
+export default function BestSkillsRadar({ skills }: BestSkillsRadarProps) {
   const centerX = 200;
   const centerY = 200;
   const radius = 100;
-  const total = skillsMock.length;
+  const total = skills.length;
   const angleStep = (2 * Math.PI) / total;
 
-  const outerPoints = skillsMock.map((_, i) => {
+  const outerPoints = skills.map((_, i) => {
     const angle = angleStep * i - Math.PI / 2;
     return {
       x: centerX + radius * Math.cos(angle),
@@ -24,7 +24,7 @@ export default function BestSkillsRadar() {
     };
   });
 
-  const innerPoints = skillsMock.map((skill, i) => {
+  const innerPoints = skills.map((skill, i) => {
     const angle = angleStep * i - Math.PI / 2;
     const skillRadius = (skill.value / 100) * radius;
     return {
@@ -33,12 +33,13 @@ export default function BestSkillsRadar() {
     };
   });
 
-  const innerPolygon = innerPoints.map((p) => `${p.x},${p.y}`).join(' ');
+  const innerPolygon = innerPoints.map((p) => `${p.x},${p.y}`).join(" ");
 
   return (
-    <div className="bg-black rounded shadow mb-8 border ">
+    <div className="bg-black rounded shadow mb-8 border">
       <h3 className="text-lg font-semibold mb-4 text-center">Best Skills</h3>
       <svg viewBox="0 0 400 400" width="100%" height="400" className="bg-black rounded">
+        {/* Axes */}
         {outerPoints.map((p, i) => (
           <line
             key={i}
@@ -51,12 +52,14 @@ export default function BestSkillsRadar() {
           />
         ))}
 
+        {/* Polygon border */}
         <polygon
-          points={outerPoints.map((p) => `${p.x},${p.y}`).join(' ')}
+          points={outerPoints.map((p) => `${p.x},${p.y}`).join(" ")}
           stroke="gray"
           fill="none"
         />
 
+        {/* Skill polygon */}
         <motion.polygon
           points={innerPolygon}
           fill="rgba(79, 70, 229, 0.5)"
@@ -64,10 +67,11 @@ export default function BestSkillsRadar() {
           strokeWidth="2"
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
-          transition={{ duration: 1, ease: 'easeOut' }}
+          transition={{ duration: 1, ease: "easeOut" }}
         />
 
-        {skillsMock.map((skill, i) => (
+        {/* Points + labels */}
+        {skills.map((skill, i) => (
           <motion.g
             key={i}
             initial={{ scale: 0 }}

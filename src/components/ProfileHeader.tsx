@@ -34,7 +34,7 @@ interface UserInfo {
 
 export default function ProfileHeader({ userInfo }: { userInfo: UserInfo | null }) {
   const router = useRouter();
-  const [showPanel, setShowPanel] = useState(false); // <-- Ajout de l'état
+  const [showPanel, setShowPanel] = useState(false);
 
   if (!userInfo) return null;
 
